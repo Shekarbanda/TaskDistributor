@@ -121,7 +121,6 @@ const Agents = () => {
               >
                 <option value="+91">In +91</option>
                 <option value="+1">US +1</option>
-                <option value="+1">CA +1</option>
                 <option value="+44">GB +44</option>
                 <option value="+61">AU +61</option>
                 <option value="+49">DE +49</option>
