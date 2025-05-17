@@ -10,26 +10,22 @@ const Agents = () => {
     email: "",
     phone: "",
     password: "",
-    countryCode: "+91"
+    countryCode: "+91",
   });
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
   const agents = useSelector((state) => state.agents.agents);
   const dispatch = useDispatch();
   const apiurl = useSelector((state) => state.api.url);
-  console.log(apiurl)
 
   useEffect(() => {
     const fetchAgents = async () => {
       try {
-        const response = await axios.get(
-          apiurl + "/user/get-agents",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await axios.get(apiurl + "/user/get-agents", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         dispatch(addAgents(response?.data?.data?.agents));
       } catch (err) {
         console.log(err);
@@ -56,12 +52,9 @@ const Agents = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setFormData({ name: "", email: "", phone: "", password: "" });
-      const response = await axios.get(
-        apiurl + "/user/get-agents",
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const response = await axios.get(apiurl + "/user/get-agents", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       dispatch(addAgents(response?.data?.data?.agents));
       toast.success("Agent added successfully!");
     } catch (err) {

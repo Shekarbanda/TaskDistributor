@@ -19,12 +19,9 @@ const Dashboard = () => {
     const fetchTasks = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
-          apiurl+"/user/get-tasks",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(apiurl + "/user/get-tasks", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const tasks = response?.data?.data;
         dispatch(addTasks(tasks));
@@ -140,9 +137,11 @@ const Dashboard = () => {
                 onClick={() => toggleAgentTasks(agentName)}
               >
                 <h4 className="text-lg font-medium text-black">{agentName}</h4>
-                
+
                 <div className="text-black flex items-center space-x-5">
-                  <h4 className="text-lg font-medium text-black">No.of Tasks - {tasks?.length}</h4>
+                  <h4 className="text-lg font-medium text-black">
+                    No.of Tasks - {tasks?.length}
+                  </h4>
                   {expandedAgents[agentName] ? (
                     <FiChevronUp size={20} />
                   ) : (

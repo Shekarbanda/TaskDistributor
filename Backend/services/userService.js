@@ -1,5 +1,5 @@
 const Agent = require("../models/agentModel");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 //checks email is valid or not
 function isValidEmail(email) {
@@ -8,9 +8,9 @@ function isValidEmail(email) {
 }
 //checks mobile number is valid or not
 function isValidPhoneNumber(phone) {
-    const phoneRegex = /^\+[1-9]\d{1,2}\d{6,14}$/;
-    return phoneRegex.test(phone);
-  }
+  const phoneRegex = /^\+[1-9]\d{1,2}\d{6,14}$/;
+  return phoneRegex.test(phone);
+}
 exports.addAgentService = async ({ email, password, name, phone }) => {
   if (!email || !password || !name || !phone) {
     throw new Error("All fields must be filled.");
@@ -37,8 +37,8 @@ exports.addAgentService = async ({ email, password, name, phone }) => {
   const agent = new Agent({
     email,
     password: hashedPassword,
-    name:name,
-    phone:phone
+    name: name,
+    phone: phone,
   });
   await agent.save();
 
@@ -47,47 +47,58 @@ exports.addAgentService = async ({ email, password, name, phone }) => {
 
 exports.getAgentsService = async () => {
   const agents = await Agent.find();
-  return { agents }
+  return { agents };
 };
 
-const XLSX = require('xlsx');
-const Task = require('../models/taskModel');
+const XLSX = require("xlsx");
+const Task = require("../models/taskModel");
 
 exports.distributeTasks = async (fileBuffer) => {
   try {
     // Parse the uploaded file
-    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+    const workbook = XLSX.read(fileBuffer, { type: "buffer" });
     const sheetName = workbook.SheetNames[0];
     const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
     // Validate CSV format
-    const requiredFields = ['FirstName', 'Phone', 'Notes'];
+    const requiredFields = ["FirstName", "Phone", "Notes"];
     if (sheet.length === 0) {
-      throw Object.assign(new Error('File is empty'), { status: 400 });
+      throw Object.assign(new Error("File is empty"), { status: 400 });
     }
     const firstRow = sheet[0];
-    const missingFields = requiredFields.filter(field => !Object.keys(firstRow).includes(field));
+    const missingFields = requiredFields.filter(
+      (field) => !Object.keys(firstRow).includes(field)
+    );
     if (missingFields.length > 0) {
-      throw Object.assign(new Error(`Missing required fields: ${missingFields.join(', ')}`), { status: 400 });
+      throw Object.assign(
+        new Error(`Missing required fields: ${missingFields.join(", ")}`),
+        { status: 400 }
+      );
     }
 
-    // Validate phone numbers and convert to number type
+    // Validate phone numbers
     for (const row of sheet) {
       const phone = row.Phone;
-      if (typeof phone !== 'string' && typeof phone !== 'number') {
-        throw Object.assign(new Error('Phone must be a string or number'), { status: 400 });
+      if (typeof phone !== "string" && typeof phone !== "number") {
+        throw Object.assign(new Error("Phone must be a string or number"), {
+          status: 400,
+        });
       }
-      
+
       const phoneNumber = Number(phone);
       if (isNaN(phoneNumber)) {
-        throw Object.assign(new Error(`Invalid phone number: ${phone}`), { status: 400 });
+        throw Object.assign(new Error(`Invalid phone number: ${phone}`), {
+          status: 400,
+        });
       }
-      row.Phone = phoneNumber; 
+      row.Phone = phoneNumber;
     }
 
     const agents = await Agent.find();
     if (agents.length === 0) {
-      throw Object.assign(new Error('No agents available to assign tasks'), { status: 400 });
+      throw Object.assign(new Error("No agents available to assign tasks"), {
+        status: 400,
+      });
     }
 
     // Clear previous tasks
@@ -124,7 +135,7 @@ exports.distributeTasks = async (fileBuffer) => {
 
 exports.getDistributedTasks = async () => {
   try {
-    const tasks = await Task.find().populate('agentId', 'name');
+    const tasks = await Task.find().populate("agentId", "name");
     return tasks;
   } catch (error) {
     throw error;

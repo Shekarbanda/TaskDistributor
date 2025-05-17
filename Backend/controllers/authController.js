@@ -1,6 +1,4 @@
-const {
-  loginUserService
-} = require("../services/authService");
+const { loginUserService } = require("../services/authService");
 const { errorResponse, successResponse } = require("../utils/responseUtils");
 
 exports.loginUser = async (req, res) => {
