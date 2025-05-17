@@ -14,9 +14,38 @@ const Agents = () => {
   });
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
+  const [mobile, setMobile] = useState("");
   const agents = useSelector((state) => state.agents.agents);
   const dispatch = useDispatch();
   const apiurl = useSelector((state) => state.api.url);
+
+  function isValidMobileNumber(countryCode, mobileNumber) {
+    // Define expected lengths for each country code
+    const countryLengths = {
+        "+91": 10, 
+        "+1": 10,
+        "+44": 10, 
+        "+61": 9,  
+        "+49": 10, 
+        "+33": 9, 
+        "+81": 10, 
+        "+86": 11, 
+        "+55": 11  
+    };
+
+    const cleanedNumber = mobileNumber.replace(/\D/g, '');
+
+    const expectedLength = countryLengths[countryCode];
+
+    if (!expectedLength) {
+        console.warn("Unsupported country code.");
+        return false;
+    }
+
+    // Return true if lengths match
+    return cleanedNumber.length === expectedLength;
+}
+
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -46,18 +75,26 @@ const Agents = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    formData.phone = formData.countryCode + formData.phone;
+    if(!isValidMobileNumber(formData.countryCode, mobile)){
+      toast.error("Invalid mobile number");
+      setLoading(false);
+      setFetchLoading(false);
+      return;
+    }
+    formData.phone = formData.countryCode + mobile;
     try {
       await axios.post(apiurl + "/user/add-agent", formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setFormData({ name: "", email: "", phone: "", password: "" });
       const response = await axios.get(apiurl + "/user/get-agents", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       dispatch(addAgents(response?.data?.data?.agents));
       toast.success("Agent added successfully!");
+      setFormData({ name: "", email: "", phone: "", password: "" , countryCode: "+91"});
+      setMobile("");
     } catch (err) {
+      formData.phone = mobile;
       toast.error(err.response?.data?.message || "Failed to add agent");
     } finally {
       setLoading(false);
@@ -112,7 +149,7 @@ const Agents = () => {
             <div className="flex space-x-2">
               {/* Country Code Dropdown */}
               <select
-                value={formData.countryCode || "+91"} // Default to +91 if not set
+                value={formData.countryCode || "+91"}
                 onChange={(e) =>
                   setFormData({ ...formData, countryCode: e.target.value })
                 }
@@ -133,9 +170,9 @@ const Agents = () => {
               {/* Phone Input */}
               <input
                 type="text"
-                value={formData.phone}
+                value={mobile}
                 onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
+                  setMobile(e.target.value)
                 }
                 className="flex-1 border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-700"
                 placeholder="Enter phone number"
@@ -160,7 +197,7 @@ const Agents = () => {
         </div>
         <button
           type="submit"
-          className="mt-4 bg-[#002f34] text-white p-3 rounded transition-colors duration-200 flex items-center"
+          className="mt-4 min-w-[100px] bg-[#002f34] text-white p-3 rounded transition-colors duration-200 flex items-center"
           disabled={loading}
         >
           {loading && (
