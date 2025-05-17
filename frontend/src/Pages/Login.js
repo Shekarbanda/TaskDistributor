@@ -2,19 +2,21 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 const Login = () => {
   const [email, setEmail] = useState("admin@gmail.com");
   const [password, setPassword] = useState("123456");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const apiurl = useSelector((state) => state.api.url);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/auth/login",
+        apiurl + "/auth/login",
         { email, password }
       );
       localStorage.setItem("token", response?.data?.data?.token);

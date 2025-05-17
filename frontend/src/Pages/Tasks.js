@@ -13,11 +13,12 @@ const Tasks = () => {
   const [fetchLoading, setFetchLoading] = useState(true);
   const tasks = useSelector(state => state.tasks.tasks);
   const dispatch = useDispatch();
+  const apiurl = useSelector((state) => state.api.url);
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/user/get-tasks', {
+        const response = await axios.get(apiurl + '/user/get-tasks', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         // setTasks(response?.data?.data);
@@ -51,13 +52,13 @@ const Tasks = () => {
     formData.append('file', file);
 
     try {
-      const result = await axios.post('http://localhost:8000/api/user/upload', formData, {
+      const result = await axios.post(apiurl + '/user/upload', formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-      const response = await axios.get('http://localhost:8000/api/user/get-tasks', {
+      const response = await axios.get(apiurl + '/user/get-tasks', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       // setTasks(response?.data?.data);

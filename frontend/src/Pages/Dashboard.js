@@ -12,6 +12,7 @@ const Dashboard = () => {
   const tasks = useSelector((state) => state.tasks.tasks);
   const dispatch = useDispatch();
   const [fetchLoading, setFetchLoading] = useState(true);
+  const apiurl = useSelector((state) => state.api.url);
 
   // Fetch tasks on component mount
   useEffect(() => {
@@ -19,7 +20,7 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost:8000/api/user/get-tasks",
+          apiurl+"/user/get-tasks",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
